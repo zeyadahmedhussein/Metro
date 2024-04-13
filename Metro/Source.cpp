@@ -186,16 +186,6 @@ void DeleteSubscriptions(Subscription UsersSubscriptionTypes[], int& numSub, int
 	}
 }
 int main() {
-	Subscription UsersSubscriptionTypes[100] = {
-		{"Zeyad", 40, 30, 1},
-		{"Mo", 30, 40, 2},
-	};
-
-	User users[MaxUsers] = { {1,{"zzz@yahoo", "password1"}},
-							{2, {"eee@yahoo","password2"}} };
-	
-	CreateNewPlan(UsersSubscriptionTypes, numSub);
-	cout << numSub;
 	
 }
 
