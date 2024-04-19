@@ -40,13 +40,13 @@ void GetCurrentDate() {
 	cout << __DATE__;
 	
 }
-void ViewUsersAccounts(User users[MaxUsers], int numUsers) {
+void ViewUsersAccountsAdmin(User users[MaxUsers], int numUsers) {
 	cout << "Accounts:\n";
 	for (int i = 0; i < numUsers; i++) {
 		cout << "Email: " << users[i].UserAccount.email << "\n";
 	}
 }
-void EditUsersAccounts(User users[MaxUsers], int numUsers, int id) {
+void EditUsersAccountsAdmin(User users[MaxUsers], int numUsers, int id) {
 	string NewEmail;
 	for (int i = 0; i < numUsers;i++) {
 		if (id == users[i].id) {
@@ -59,7 +59,7 @@ void EditUsersAccounts(User users[MaxUsers], int numUsers, int id) {
 	cout << "User Not Found";
 	
 }
-void DeleteUsersAccounts(User users[MaxUsers], int &numUsers, int id) {
+void DeleteUsersAccountsAdmin(User users[MaxUsers], int &numUsers, int id) {
 	for (int i = 0; i < numUsers; i++) {
 		if (id == users[i].id) {
 
@@ -77,18 +77,23 @@ void DeleteUsersAccounts(User users[MaxUsers], int &numUsers, int id) {
 		}
 	}
 }
-void CreateNewPlan(Subscription UserSubscriptionTypes[], int& numSub) {
+void CreateNewPlanAdmin(Subscription UserSubscriptionTypes[], int& numSub) {
 	string newName;
+	string type;
 	int newValidityDays;
 	float newPrice;
 	int NewIndex;
 	bool IndexExists = false;
-
+	cin>>type;
 	cin >> newName;
 	cin >> newValidityDays;
 	cin >> newPrice;
 	cin >> NewIndex;
+/*
+Here comes the code of the subscription type whether it is Student, Wallet or Public
 
+
+*/
 	if (numSub <= 100) {
 		UserSubscriptionTypes[numSub].subName = newName;
 		UserSubscriptionTypes[numSub].ValidityDays = newValidityDays;
@@ -124,6 +129,7 @@ void CreateNewPlan(Subscription UserSubscriptionTypes[], int& numSub) {
 }
 void ModifySubscriptionAdmin(Subscription UsersSubscriptionTypes[],int index,int numSubscriptions) {
 	string newName;
+	string type;
 	int newValidityDays;
 	float newPrice;
 	int NewIndex;
@@ -132,6 +138,12 @@ void ModifySubscriptionAdmin(Subscription UsersSubscriptionTypes[],int index,int
 	cin >> newValidityDays;
 	cin >> newPrice;
 	cin >> NewIndex;
+	cin>>type;
+	/*
+Here comes the code of the subscription type whether it is Student, Wallet or Public
+
+
+*/
 	for (int i = 0; i < numSub;i++) {
 		if (index==UsersSubscriptionTypes[i].index) {
 			UsersSubscriptionTypes[i].subName = newName;
@@ -172,7 +184,7 @@ void DeleteSubscriptions(Subscription UsersSubscriptionTypes[], int& numSub, int
 		if (index == users[i].id) {
 
 			UsersSubscriptionTypes[i] = UsersSubscriptionTypes[i + 1];
-			numSub = numSub - 1; // Decrement the count of users
+			numSub = numSub - 1; // Decrement the count of Subsciription plans
 			cout << "User Subscription Plan deleted successfully!\n";
 			return;
 
