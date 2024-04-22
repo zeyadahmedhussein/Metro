@@ -31,6 +31,33 @@ bool isAdmin(string email) {
     return email == "admin@metro.com";
 }
 
+bool findEmail(string email) {
+    ifstream file("users.txt");
+    string storedEmail;
+    while (file >> storedEmail) {
+        if (storedEmail == email) {
+            file.close();
+            return true;
+        }
+    }
+    file.close();
+    return false;
+}
+
+bool find(string email, string password) {
+    ifstream file("users.txt");
+    string storedEmail, storedPassword;
+    while (file >> storedEmail >> storedPassword) {
+        if (storedEmail == email && storedPassword == password) {
+            file.close();
+            return true;
+        }
+    }
+    file.close();
+    return false;
+}
+
+
 bool signup(user users[]) {
     user temp;
     cout << "Enter your name: ";
@@ -62,31 +89,6 @@ bool signup(user users[]) {
     return true;
 }
 
-bool findEmail(string email) {
-    ifstream file("users.txt");
-    string storedEmail;
-    while (file >> storedEmail) {
-        if (storedEmail == email) {
-            file.close();
-            return true;
-        }
-    }
-    file.close();
-    return false;
-}
-
-bool find(string email, string password) {
-    ifstream file("users.txt");
-    string storedEmail, storedPassword;
-    while (file >> storedEmail >> storedPassword) {
-        if (storedEmail == email && storedPassword == password) {
-            file.close();
-            return true;
-        }
-    }
-    file.close();
-    return false;
-}
 
 bool login(user users[]) {
     string email, password;
