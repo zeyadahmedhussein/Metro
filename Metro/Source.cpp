@@ -1,8 +1,13 @@
 #include <iostream>
+#include <string>
 #include <ctime>
+#include<cstdlib>
+#define maxStations 100
+
 using namespace std;
 const int MaxUsers = 100;
 const int MaxSub = 100;
+
 int firstLineStations = 35, secondLineStations = 20, thirdLineStations = 29;
 int lineStations[3] = { firstLineStations, secondLineStations, thirdLineStations };
 int numUsers = 2;
@@ -30,7 +35,7 @@ struct MetroStations {
 	int id, line;
 	string name;
 };
-MetroStations stations[3][40];
+MetroStations stations[3][maxStations];
 struct destination {
 	string station;
 	int id,line ;
@@ -214,7 +219,7 @@ void DeleteSubscriptions(Subscription UsersSubscriptionTypes[], int& numSub, int
 		}
 	}
 }
-void StationsInitialization(MetroStations stations[3][40]) {
+void StationsInitialization(MetroStations stations[3][maxStations]) {
 	// Initialize stations for Line 1
 	MetroStations line1Stations[] = {
 		{1, 1, "El Marg El Gedida"},
@@ -255,7 +260,7 @@ void StationsInitialization(MetroStations stations[3][40]) {
 	};
 
 	// Copy stations for Line 1 to the array of struct
-	for (int i = 0; i < 35; ++i) {
+	for (int i = 0; i < firstLineStations; ++i) {
 		stations[0][i] = line1Stations[i];
 	}
 	
@@ -284,7 +289,7 @@ void StationsInitialization(MetroStations stations[3][40]) {
 	};
 
 	// Copy stations for Line 2 to the array of struct
-	for (int i = 0; i < 20; ++i) {
+	for (int i = 0; i < secondLineStations; ++i) {
 		stations[1][i] = line2Stations[i];
 	}
 
@@ -323,7 +328,7 @@ void StationsInitialization(MetroStations stations[3][40]) {
 		};
 
 		// Copy stations for Line 3 to the array of struct
-		for (int i = 0; i < 29; ++i) {
+		for (int i = 0; i < thirdLineStations; ++i) {
 			stations[2][i] = line3Stations[i];
 		}
 	}
@@ -434,30 +439,67 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
 }
 
 
-void ViewMetroStations(MetroStations stations[3][40]) {
+void AddMetroStation(MetroStations stations[3][maxStations]) {
+	int lineNumber, NumberOfStations;
+	char option;
+	do {
+		bool stationAdded = false;
+		cout << "Enter the line you want to add a station to: ";
+		cin >> lineNumber;
+		if (lineNumber >= 1 && lineNumber <= 3) {
+			NumberOfStations = lineStations[lineNumber - 1];
+			if (NumberOfStations < maxStations) {
+				string NewStation;
+				cout << "Enter the name of the new station: ";
+				cin.ignore();
+				getline(cin, NewStation);
+				stations[lineNumber - 1][NumberOfStations].name = NewStation;
+				stations[lineNumber - 1][NumberOfStations].id = NumberOfStations + 1;
+				stations[lineNumber - 1][NumberOfStations].line = lineNumber;
+				NumberOfStations++;
+				lineStations[lineNumber - 1] = NumberOfStations; // Update the global variable
+				stationAdded = true;
+			}
+			else {
+				cout << "Cannot add more stations to this line. Maximum capacity reached.\n";
+			}
+		}
+		else {
+			cout << "Invalid line number!\n";
+		}
+
+		if (stationAdded) {
+			cout << "Station added successfully!\n";
+		}
+		else {
+			cout << "Error adding station!\n";
+		}
+
+		cout << "Do you want to add another station? (y/n): ";
+		cin >> option;
+	} while (option == 'y' || option == 'Y');
+}
+void ViewMetroStations(MetroStations stations[3][maxStations]) {
 	int lineNumber, NumberOfStations;
 	char option;
 	do {
 		cout << "Enter the line you want to view \n";
 		cin >> lineNumber;
 
-		if (lineNumber == 1)
-			NumberOfStations = firstLineStations; //35
-		else if (lineNumber == 2)
-			NumberOfStations = secondLineStations; //20
-		else if (lineNumber == 3)
-			NumberOfStations = thirdLineStations;//29
+		if (lineNumber >= 1 && lineNumber <= 3) {
+			NumberOfStations = lineStations[lineNumber - 1];
 
-		cout << "Stations:\n";
-		for (int i = 0; i < NumberOfStations; i++) {
-			cout << i + 1 << "->" << stations[lineNumber - 1][i].name << "\n";
+			cout << "Stations:\n";
+			for (int i = 0; i < NumberOfStations; i++) {
+				cout << i + 1 << "->" << stations[lineNumber - 1][i].name << "\n";
+			}
 		}
 		cout << "Do you want to view another line ? (y/n) \n";
 		cin >> option;
 	} while (option == 'y' || option == 'Y');
 	
 }
-void EditMetroStation(MetroStations stations[3][40]) {
+void EditMetroStation(MetroStations stations[3][maxStations]) {
 	
 	int lineNumber, NumberOfStations, id;
 	string NewStation;
@@ -486,7 +528,7 @@ void EditMetroStation(MetroStations stations[3][40]) {
 	}
 
 }
-void DeleteMetroStations(MetroStations stations[3][40]) {
+void DeleteMetroStation(MetroStations stations[3][maxStations]) {
 	int lineNumber, NumberOfStations, id;
 	cout << "Enter the line you want to delete from: \n";
 	cin >> lineNumber;
@@ -525,7 +567,6 @@ void DeleteMetroStations(MetroStations stations[3][40]) {
 		cout << "Invalid line number!\n";
 	}
 }
-
 
 int main() {
 	
