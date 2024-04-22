@@ -1,0 +1,142 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#define NumUser 100
+using namespace std;
+
+struct account {
+    string username;
+    string password;
+    string email;
+};
+
+struct user {
+    account UserAccount;
+    bool isAdmin = true;
+};
+
+bool signup(user users[]);
+bool findEmail(string email);
+bool find(string email, string password);
+bool login(user users[]);
+
+void saveUser(const user& usr) {
+    ofstream file("users.txt", ios::app);
+    //isAdmin remain ??
+    file << usr.UserAccount.username << " " << usr.UserAccount.password << " " << usr.UserAccount.email << " " << usr.isAdmin << endl;
+    file.close();
+}
+
+bool isAdmin(string email) {
+    return email == "admin@metro.com";
+}
+
+bool signup(user users[]) {
+    user temp;
+    cout << "Enter your name: ";
+    cin >> temp.UserAccount.username;
+    cout << "Enter your email: ";
+    cin >> temp.UserAccount.email;
+    //Check admin
+    if (!isAdmin(temp.UserAccount.email)) {
+        temp.isAdmin = false;
+    }
+    else {
+        cout << "Valid admin email" << endl;
+        temp.isAdmin = true;
+    }
+
+    if (findEmail(temp.UserAccount.email)) {
+        cout << "This email is already in use." << endl;
+        return false;
+    }
+
+
+    cout << "Enter your password: ";
+    cin >> temp.UserAccount.password;
+
+    // Save user to file
+    saveUser(temp);
+
+    cout << "Signup successful." << endl;
+    return true;
+}
+
+bool findEmail(string email) {
+    ifstream file("users.txt");
+    string storedEmail;
+    while (file >> storedEmail) {
+        if (storedEmail == email) {
+            file.close();
+            return true;
+        }
+    }
+    file.close();
+    return false;
+}
+
+bool find(string email, string password) {
+    ifstream file("users.txt");
+    string storedEmail, storedPassword;
+    while (file >> storedEmail >> storedPassword) {
+        if (storedEmail == email && storedPassword == password) {
+            file.close();
+            return true;
+        }
+    }
+    file.close();
+    return false;
+}
+
+bool login(user users[]) {
+    string email, password;
+    cout << "Enter your email: ";
+    cin >> email;
+    cout << "Enter your password: ";
+    cin >> password;
+
+    // Open the file
+    ifstream file("users.txt");
+    if (!file) {
+        cout << "Error opening file." << endl;
+        return false;
+    }
+
+    string storedEmail, storedPassword;
+    bool loggedIn = false;
+
+    // Read each line from the file and check for a matching email and password
+    while (file >> storedEmail >> storedPassword) {
+        if (storedEmail == email && storedPassword == password) {
+            cout << "Logged in successfully." << endl;
+            loggedIn = true;
+            break;
+        }
+    }
+
+    file.close();
+
+    if (!loggedIn) {
+        cout << "Invalid email or password." << endl;
+        return false;
+    }
+
+    return true;
+}
+
+
+
+int main() {
+    user users[NumUser];
+
+    // Test login and signup
+    cout << "Signup Form:" << endl;
+    signup(users);
+
+
+    cout << "Login Form:" << endl;
+    login(users);
+
+
+    return 0;
+}
