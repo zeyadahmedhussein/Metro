@@ -3,6 +3,8 @@
 using namespace std;
 const int MaxUsers = 100;
 const int MaxSub = 100;
+int firstLineStations = 35, secondLineStations = 20, thirdLineStations = 29;
+int lineStations[3] = { firstLineStations, secondLineStations, thirdLineStations };
 int numUsers = 2;
 int numSub = 2;
 struct Account {
@@ -430,6 +432,100 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
 	//fair zone to ghamra
 	
 }
+
+
+void ViewMetroStations(MetroStations stations[3][40]) {
+	int lineNumber, NumberOfStations;
+	char option;
+	do {
+		cout << "Enter the line you want to view \n";
+		cin >> lineNumber;
+
+		if (lineNumber == 1)
+			NumberOfStations = firstLineStations; //35
+		else if (lineNumber == 2)
+			NumberOfStations = secondLineStations; //20
+		else if (lineNumber == 3)
+			NumberOfStations = thirdLineStations;//29
+
+		cout << "Stations:\n";
+		for (int i = 0; i < NumberOfStations; i++) {
+			cout << i + 1 << "->" << stations[lineNumber - 1][i].name << "\n";
+		}
+		cout << "Do you want to view another line ? (y/n) \n";
+		cin >> option;
+	} while (option == 'y' || option == 'Y');
+	
+}
+void EditMetroStation(MetroStations stations[3][40]) {
+	
+	int lineNumber, NumberOfStations, id;
+	string NewStation;
+	cout << "Enter the line you want to edit from: \n";
+	cin >> lineNumber;
+	cout << "Enter the number of the station you want to edit: ";
+	cin >> id;
+	
+	if (lineNumber >= 1 && lineNumber <= 3) {
+		NumberOfStations = lineStations[lineNumber - 1];
+		bool stationFound = false;
+		for (int i = 0; i < NumberOfStations; i++) {
+			if (id == stations[lineNumber-1][i].id) {
+				cout << "Enter the new station for the metro:" << endl;
+				cin.ignore();
+				getline(cin, NewStation);
+				stations[lineNumber-1][i].name = NewStation;
+				return;
+			}
+		}
+		if (!stationFound) 
+			cout << "Station not found!\n";
+	}
+	else {
+		cout << "Invalid line number!\n";
+	}
+
+}
+void DeleteMetroStations(MetroStations stations[3][40]) {
+	int lineNumber, NumberOfStations, id;
+	cout << "Enter the line you want to delete from: \n";
+	cin >> lineNumber;
+	cout << "Enter the number of the station you want to delete: ";
+	cin >> id;
+	if (lineNumber >= 1 && lineNumber <= 3) {
+		NumberOfStations = lineStations[lineNumber - 1];
+		bool stationFound = false;
+		for (int i = 0; i < NumberOfStations; i++) {
+			if (id == stations[lineNumber - 1][i].id) {
+				// Shift stations after the deleted station one index to the left
+				for (int j = i; j < NumberOfStations - 1; j++) {
+					stations[lineNumber - 1][j] = stations[lineNumber - 1][j + 1];
+				}
+				NumberOfStations--; // Decrement the count of stations
+				cout << "Metro station deleted successfully!\n";
+				lineStations[lineNumber - 1] = NumberOfStations; // Update the global variable
+				stationFound = true;
+				break;
+			}
+		}
+		if (stationFound) {
+			// Update the global variable for the number of stations
+			if (lineNumber == 1)
+				firstLineStations = NumberOfStations;
+			else if (lineNumber == 2)
+				secondLineStations = NumberOfStations;
+			else if (lineNumber == 3)
+				thirdLineStations = NumberOfStations;
+		}
+		else {
+			cout << "Station not found!\n";
+		}
+	}
+	else {
+		cout << "Invalid line number!\n";
+	}
+}
+
 
 int main() {
 	
