@@ -107,7 +107,7 @@ bool login(user users[]) {
     string storedEmail, storedPassword;
     bool loggedIn = false;
 
-    // Read each line from the file and check for a matching email and password
+    // Check from the file the email and password
     while (file >> storedEmail >> storedPassword) {
         if (storedEmail == email && storedPassword == password) {
             cout << "Logged in successfully." << endl;
