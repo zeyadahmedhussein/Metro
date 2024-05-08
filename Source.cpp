@@ -59,9 +59,9 @@ struct User {
 };
 
 struct MetroStations {
-    int id, line;
-    char symbol;
-    string name;
+     int id, line, zone, numberOfCheckIn,numberOfCheckOut;
+  char symbol;
+  string name;
 };
 
 MetroStations stations[3][maxStations];
@@ -1142,14 +1142,14 @@ void StoreTheDataOfStations() {
 
     if (outfile.is_open()) {
         for (int i = 0; i < lineStations[0]; i++) {
-            outfile << stations[0][i].line << " " << stations[0][i].name << " " << stations[0][i].symbol << endl;
+            outfile << stations[0][i].line << " " << stations[0][i].name << " " << stations[0][i].symbol << stations[0][i].zone << stations[0][i].numberOfCheckIn<< stations[0][i].numberOfCheckOut <<endl;
         }
         for (int i = 0; i < lineStations[1]; i++) {
-            outfile << stations[1][i].line << " " << stations[1][i].name << " " << stations[1][i].symbol << endl;
+            outfile << stations[1][i].line << " " << stations[1][i].name << " " << stations[1][i].symbol << stations[1][i].zone<< stations[1][i].numberOfCheckIn << stations[1][i].numberOfCheckOut << endl;
         }
 
         for (int i = 0; i < lineStations[2]; i++) {
-            outfile << stations[2][i].line << " " << stations[2][i].name << " " << stations[2][i].symbol << endl;
+            outfile << stations[2][i].line << " " << stations[2][i].name << " " << stations[2][i].symbol << stations[2][i].zone<< stations[2][i].numberOfCheckIn << stations[2][i].numberOfCheckOut << endl;
         }
 
         outfile.close();
@@ -1158,6 +1158,7 @@ void StoreTheDataOfStations() {
         cerr << "Error: Could not open stations file." << endl;
     }
 }
+
 void ReadFromFileTheDataOfStations() {
     ifstream infile("stations.txt");
 
@@ -1167,6 +1168,9 @@ void ReadFromFileTheDataOfStations() {
             stations[0][i].id = i + 1;
             infile >> stations[0][i].name;
             infile >> stations[0][i].symbol;
+            infile >> stations[0][i].zone;
+            infile >> stations[0][i].numberOfCheckIn;
+            infile >> stations[0][i].numberOfCheckOut;
         }
         for (int i = 0; i < lineStations[1]; i++) {
             infile >> stations[1][i].line;
@@ -1177,13 +1181,19 @@ void ReadFromFileTheDataOfStations() {
             stations[1][i].id = i + 1;
             infile >> stations[1][i].name;
             infile >> stations[1][i].symbol;
+            infile >> stations[1][i].zone;
+            infile >> stations[1][i].numberOfCheckIn;
+            infile >> stations[1][i].numberOfCheckOut;
+
         }
         for (int i = 0; i < lineStations[2]; i++) {
             infile >> stations[2][i].line;
             stations[2][i].id = i + 1;
             infile >> stations[2][i].name;
-
             infile >> stations[2][i].symbol;
+            infile >> stations[2][i].zone;
+            infile >> stations[2][i].numberOfCheckIn;
+            infile >> stations[2][i].numberOfCheckOut;
         }
 
         infile.close();
@@ -1192,6 +1202,7 @@ void ReadFromFileTheDataOfStations() {
         cerr << "Error: Could not open stations file." << endl;
     }
 }
+
 void StationsManagementAdmin() {
     int choice;
     char anotherFunction;
