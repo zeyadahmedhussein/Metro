@@ -55,6 +55,7 @@ struct User {
     bool SubFound = false;
     bool signedUp = false;
     int ridesCount;
+    float walletMoney;
 };
 
 struct MetroStations {
@@ -197,7 +198,7 @@ void StoreTheDataOfUsers() {
     if (outfile.is_open()) {
         for (int i = 0; i < realUsers; i++) {
             outfile << users[i].UserAccount.email << " " << users[i].UserAccount.password << " "
-                << users[i].id << " " << users[i].balance << " " << users[i].Sub.subName << " " << users[i].SubFound << endl;
+                << users[i].id << " " << users[i].balance << " " << users[i].Sub.subName << " " << users[i].SubFound<<""<<users[i].walletMoney << endl;
         }
 
         outfile.close();
@@ -259,47 +260,97 @@ void ReadFromFileTheDataOfUsers() {
 bool SignUp() {
     User temp;
 
-    cout << "Enter your name: " << endl;
+    cout << "Enter your name or press 0 to exit: ";
     cin >> temp.UserAccount.username;
-    users[realUsers].UserAccount.username = temp.UserAccount.username;
+    if (temp.UserAccount.username == "0") {
+        cout << "Exiting sign-up..." << endl;
+        return false;
+    }
+    else {
+        users[realUsers].UserAccount.username = temp.UserAccount.username;
+    }
+
+    string email;
     while (true) {
-        cout << "Enter your email" << endl;
-        cin >> temp.UserAccount.email;
-        if (findEmail(temp.UserAccount.email, users)) {
+        cout << "Enter your email or press 0 to exit: ";
+        cin >> email;
+        if (email == "0") {
+            cout << "Exiting sign-up..." << endl;
+            return false;
+        }
+        if (findEmail(email, users)) {
             cout << "This email already exists. Please enter another email." << endl;
         }
         else {
-            users[realUsers].UserAccount.email = temp.UserAccount.email;
+            temp.UserAccount.email = email;
+            users[realUsers].UserAccount.email = email;
             break; // Break out of the loop if the email is new
         }
     }
 
-    cout << "Enter your password:" << endl;
-    cin >> temp.UserAccount.password;
-    users[realUsers].UserAccount.password = temp.UserAccount.password;
-    cout << "Enter your balance: " << endl;
-    cin >> temp.balance;
-    
-  
-    while (temp.balance < 50 || temp.balance<0) {
-        if (temp.balance<0) {
-            cout << "Balance cannot be in negative!" << endl;
-            cout << "Enter the balance:" << endl;
-            cin >> temp.balance;
-            if (temp.balance>50) {
-                
-            }
-       }
-        else if(temp.balance<50){
-            cout << "Minimum balance is 50, Enter another balance: " << endl;
-            cout << "Ënter the balance" << endl;
-            cin >> temp.balance;
+    string confirm_email;
+    while (true) {
+        cout << "Confirm your email or press 0 to exit: ";
+        cin >> confirm_email;
+        if (confirm_email == "0") {
+            cout << "Exiting sign-up..." << endl;
+            return false;
         }
-        
-       
+        if (temp.UserAccount.email != confirm_email) {
+            cout << "Emails do not match. Please re-enter your email." << endl;
+        }
+        else {
+            break; // Break out of the loop if the emails match
+        }
     }
 
-    users[realUsers].balance= temp.balance;
+    cout << "Enter your password or press 0 to exit: ";
+    cin >> temp.UserAccount.password;
+    if (temp.UserAccount.password == "0") {
+        cout << "Exiting sign-up..." << endl;
+        return false;
+    }
+
+    string confirm_password;
+    while (true) {
+        cout << "Confirm your password or press 0 to exit: ";
+        cin >> confirm_password;
+        if (confirm_password == "0") {
+            cout << "Exiting sign-up..." << endl;
+            return false;
+        }
+        if (temp.UserAccount.password != confirm_password) {
+            cout << "Passwords do not match. Please re-enter your password." << endl;
+        }
+        else {
+            break; // Break out of the loop if the passwords match
+        }
+    }
+
+    cout << "Enter your balance or press 0 to exit: ";
+    cin >> temp.balance;
+    if (temp.balance == 0) {
+        cout << "Exiting sign-up..." << endl;
+        return false;
+    }
+
+    while (temp.balance < 50 || temp.balance < 0) {
+        if (temp.balance < 0) {
+            cout << "Balance cannot be negative!" << endl;
+        }
+        else if (temp.balance < 50) {
+            cout << "Minimum balance is 50. Please enter another balance: ";
+        }
+        cin >> temp.balance;
+        if (temp.balance == 0) {
+            cout << "Exiting sign-up..." << endl;
+            return false;
+        }
+    }
+
+    // If all data is entered correctly, proceed to store the user's information
+    users[realUsers].UserAccount.password = temp.UserAccount.password;
+    users[realUsers].balance = temp.balance;
     UserIdGenerator();
     indexOfUsers = users[realUsers].id;
     users[realUsers].signedUp = true;
@@ -310,19 +361,35 @@ bool SignUp() {
 
     return true;
 }
-bool isAdmin;
 
+bool isAdmin;
+void UpdatePersonalInformation();
 
 bool Login() {
+    char choice;
     User temp;
-    cout << "Enter your Email: " << endl;
+    cout << "Enter your Email or "<<left<<setw(20)<<" You can Press ----> 0 to exit: "<<endl;
     cin >> temp.UserAccount.email;
-    cout << "Enter your Password: " << endl;
+    if (temp.UserAccount.email == "0") {
+        cout << "Exiting login..." << endl;
+        return false;
+    }
+
+    cout << "Enter your Password or press 0 to exit: ";
     cin >> temp.UserAccount.password;
+    if (temp.UserAccount.password == "0") {
+        cout << "Exiting login..." << endl;
+        return false;
+    }
 
     if (temp.UserAccount.email == "admin.com" && temp.UserAccount.password == "1") {
         isAdmin = true;
+        cout << "Logged in as admin!" << endl;
+        DeletScreen();
+        login_status = true;
+        return true;
     }
+
     if (find(temp.UserAccount.email, temp.UserAccount.password, users)) {
         cout << "Logged in successfully! " << endl;
         DeletScreen();
@@ -340,7 +407,6 @@ bool Login() {
         DeletScreen();
         return false;
     }
-
 }
 int readrealSub() {
     int count = 0;
@@ -438,8 +504,8 @@ void StoreTheRealSub() {
     }
 }
 void ModifySubscriptionAdmin() {
-    int NewValidity;
-    int NewRides;
+    int NewValidity = 0;
+    int NewRides = 0;
     string NewName;
     char id;
 
@@ -457,7 +523,7 @@ void ModifySubscriptionAdmin() {
 
             int choice;
             do {
-                cout << "1 ---> Edit name" << endl << "2 ---> Edit Validity Days" << endl << "3 ---> Edit Trips Count" << endl;
+                cout << "1 ---> Edit name" << endl << "2 ---> Edit Validity Days" << endl << "3 ---> Edit Trips Count" << endl << "4 ---> Exit" << endl; // Added option 4: Exit
                 cin >> choice;
 
                 switch (choice) {
@@ -469,30 +535,51 @@ void ModifySubscriptionAdmin() {
                 case 2:
                     cout << "Enter the new Validity days of subscription:" << endl;
                     cin >> NewValidity;
+                    if (!isBalancePositive(NewValidity)) {
+                        cout << "Validity days cannot be zero or negative. Do you want to enter a different value? (y/n)" << endl;
+                        char response;
+                        cin >> response;
+                        if (response == 'n' || response == 'N') {
+                            break;
+                        }
+                    }
                     SubTypes[i].ValidityDays = NewValidity;
                     break;
                 case 3:
                     cout << "Enter the new Trips of subscription:" << endl;
                     cin >> NewRides;
+                    if (!isBalancePositive(NewRides)) {
+                        cout << "Trips count cannot be zero or negative. Do you want to enter a different value? (y/n)" << endl;
+                        char response;
+                        cin >> response;
+                        if (response == 'n' || response == 'N') {
+                            break;
+                        }
+                    }
                     SubTypes[i].ridesCount = NewRides;
                     break;
+                case 4: // Added option 4: Exit
+                    cout << "Exiting..." << endl;
+                    return; // Exit the function
                 default:
                     cout << "Invalid option. Please enter a valid option.\n";
                     // Clear input buffer
                     cin.clear();
-                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Updated here
                     break;
                 }
-            } while (choice < 1 || choice > 3); // Repeat until a valid option is entered
+            } while (choice != 4); // Repeat until the user chooses to exit
 
-            // Display subscription details after editing
-            cout << "Subscription details after editing:\n";
-            cout << left << setw(20) << "Name: " << SubTypes[i].subName << "\n";
-            cout << left << setw(20) << "Validity Days: " << SubTypes[i].ValidityDays << " days\n";
-            cout << left << setw(20) << "Trips Count: " << SubTypes[i].ridesCount << " trips\n";
-            cout << "-----------------------------------------------------------" << endl;
+            // Display subscription details after editing if no negative number was entered
+            if (choice != 4 && (isBalancePositive(NewValidity) || isBalancePositive(NewRides))) {
+                cout << "Subscription details after editing:\n";
+                cout << left << setw(20) << "Name: " << SubTypes[i].subName << "\n";
+                cout << left << setw(20) << "Validity Days: " << SubTypes[i].ValidityDays << " days\n";
+                cout << left << setw(20) << "Trips Count: " << SubTypes[i].ridesCount << " trips\n";
+                cout << "-----------------------------------------------------------" << endl;
 
-            cout << "Subscription successfully edited!\n";
+                cout << "Subscription successfully edited!\n";
+            }
             return;
         }
     }
@@ -686,56 +773,88 @@ void DeleteUsersAccountsAdmin() {
 void FareManagement() {
     char choice;
     do {
-        char stage, type;
-        cout << "Enter the stage you want to change its prices: " << endl;
-        cin >> stage;
-        cout << "Enter the sub type:" << endl;
-        cin >> type;
-        float newPrice;
+        char category;
+        cout << "Enter 'E' to edit subscription prices or 'C' to edit constant prices: ";
+        cin >> category;
 
-        int i = -1; // Initializing i outside the switch statement
+        if (category == 'E') { // Editing subscription prices
+            char stage, type;
+            cout << "\nEnter the stage you want to change its prices (1-4): ";
+            cin >> stage;
+            cout << "Enter the subscription type (S for Student, W for Waller, M for PublicMonthly, A for PublicAnnual): ";
+            cin >> type;
+            float newPrice;
 
-        switch (stage) {
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        {
-            int stageIndex = stage - '1'; // Convert stage character to index (0-based)
+            int i = -1; // Initializing i outside the switch statement
 
-            for (int j = 0; j < realSub; j++) {
-                if (type == SubTypes[j].index) {
-                    i = j; // Update i if the subscription type is found
-                    break;
+            switch (stage) {
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            {
+                int stageIndex = stage - '1'; // Convert stage character to index (0-based)
+
+                for (int j = 0; j < realSub; j++) {
+                    if (type == SubTypes[j].index) {
+                        i = j; // Update i if the subscription type is found
+                        break;
+                    }
                 }
-            }
 
-            if (i != -1) {
-                cout << "The price of stage " << stage << " for subscription type " << type << ": "
-                    << SubTypes[i].price[stageIndex] << endl;
-                cout << "Enter the new Price:" << endl;
-                cin >> newPrice;
-                if (newPrice >= 0) { // Validate that price is not negative
-                    SubTypes[i].price[stageIndex] = newPrice;
-                    cout << "Price Updated successfully!" << endl;
+                if (i != -1) {
+                    cout << "\nThe current price of stage " << stage << " for subscription type " << type << " is: "
+                        << SubTypes[i].price[stageIndex] << endl;
+                    cout << "Enter the new price for stage " << stage << " and subscription type " << type << ": ";
+                    cin >> newPrice;
+                    if (newPrice >= 0) { // Validate that price is not negative
+                        SubTypes[i].price[stageIndex] = newPrice;
+                        cout << "\nPrice updated successfully!" << endl;
+                    }
+                    else {
+                        cout << "\nPrice cannot be negative. Please enter a valid price." << endl;
+                    }
                 }
                 else {
-                    cout << "Price cannot be negative. Please enter a valid price." << endl;
+                    cout << "\nSubscription type does not exist!" << endl;
+                }
+                break;
+            }
+            default:
+                cout << "\nInvalid stage! Please enter a stage between 1 and 4." << endl;
+                break;
+            }
+        }
+        else if (category == 'C') { // Editing constant prices
+            int stageIndex;
+            cout << "\nEnter the stage for which you want to change the constant price (1-4): ";
+            cin >> stageIndex;
+            if (stageIndex >= 1 && stageIndex <= 4) {
+                float newPrice;
+                cout << "Enter the new constant price for stage " << stageIndex << ": ";
+                cin >> newPrice;
+                if (newPrice >= 0) { // Validate that price is not negative
+                    constantPrice[stageIndex - 1] = newPrice;
+                    cout << "\nConstant price for stage " << stageIndex << " updated successfully!" << endl;
+                }
+                else {
+                    cout << "\nPrice cannot be negative. Please enter a valid price." << endl;
                 }
             }
             else {
-                cout << "Subscription type does not exist!" << endl;
+                cout << "\nInvalid stage! Please enter a stage between 1 and 4." << endl;
             }
-            break;
         }
-        default:
-            cout << "Invalid stage!" << endl;
-            break;
+        else {
+            cout << "\nInvalid category! Please enter 'S' for subscription types or 'C' for constant prices." << endl;
         }
-        cout << "Want to edit another prices (y/n):" << endl;
+
+        cout << "\nDo you want to edit another set of prices? (y/n): ";
         cin >> choice;
     } while (choice == 'y' || choice == 'Y');
 }
+
+
 
 string CurrentDate() {
     // Get the current time
@@ -939,7 +1058,7 @@ void ReadTheSubscriptionOfUsers() {
     if (infile.is_open()) {
         for (int i = 0; i < realUsers; i++) {
 
-            infile >> users[i].Sub.endDate >> users[i].Sub.index >> users[i].Sub.ridesCount >> users[i].Sub.stage >> users[i].Sub.startDate >> users[i].Sub.subName >> users[i].Sub.ValidityDays;
+            infile >> users[i].Sub.endDate >> users[i].Sub.index >> users[i].Sub.ridesCount >> users[i].Sub.stage >> users[i].Sub.startDate >> users[i].Sub.subName >> users[i].Sub.ValidityDays >> users[i].walletMoney;
         }
 
         infile.close();
@@ -975,37 +1094,48 @@ void StoreStationNumbersToFile() {
 }
 
 void UserManagementAdmin() {
-    int choice;
-    char anotherFunction;
+    char anotherFunction = 'y'; // Flag for continuing admin operations
 
+    while (anotherFunction == 'y' || anotherFunction == 'Y') {
+        // Check if there are any users before proceeding
+        if (realUsers == 0) {
+            cout << "There are no users to manage." << endl;
+            break; // Exit the loop if no users
+        }
 
+        // Display user accounts
+        ViewUsersAccountsAdmin(users, realUsers);
 
+        int choice;
+        cout << "Choose what you want to do:" << endl;
+        cout << "------------------------------------" << endl;
+        cout << "1 = Edit Users Data" << endl;
+        cout << "2 = Delete Users" << endl;
+        cout << "3 = Exit" << endl; // Add exit option
+        cin >> choice;
 
-    ViewUsersAccountsAdmin(users, realUsers);
-    cout << "Choose what you want to do:" << endl;
-    cout << "------------------------------------" << endl;
-    cout << "1 = Edit Users Data" << endl;
-    cout << "2 = Delete Users" << endl;
-    cin >> choice;
-    switch (choice) {
-    case 1:
-        EditUsersAccountsAdmin(users, realUsers);
-        DeletScreen();
-        break;
+        switch (choice) {
+        case 1:
+            EditUsersAccountsAdmin(users, realUsers);
+            DeletScreen();
+            break;
+        case 2:
+            DeleteUsersAccountsAdmin();
+            DeletScreen();
+            break;
+        case 3:
+            anotherFunction = 'n'; // Set flag to exit
+            break;
+        default:
+            cout << "Invalid choice. Please enter a number between 1 and 3." << endl;
+        }
 
-
-    case 2:
-        DeleteUsersAccountsAdmin();
-        DeletScreen();
-        break;
+        // Prompt to continue with admin operations
+        if (realUsers > 0 && anotherFunction != 'n') {
+            cout << "Do you want to perform another operation (y/n)? ";
+            cin >> anotherFunction;
+        }
     }
-
-
-
-
-
-
-
 }
 void StoreTheDataOfStations() {
     ofstream outfile("stations.txt");
@@ -1106,24 +1236,30 @@ void StationsManagementAdmin() {
 void viewUserRideHistory() {
     char choice;
     do {
-        cout << users[indexOfUsers].UserAccount.username << " Rides:" << endl;
-        for (int i = users[indexOfUsers].Sub.ridesCount - 1; i >= 0; i--) {
-            cout << "Ride " << setw(10) << i + 1 << endl;
-            cout << "------------------------------------------\n";
-            cout << left << setw(15) << "Date:" << users[indexOfUsers].ridedetails[i].rideDate << endl;
-            cout << left << setw(15) << "Ride ID:" << users[indexOfUsers].ridedetails[i].rideID << endl;
-            cout << left << setw(15) << "From station:" << users[indexOfUsers].ridedetails[i].checkInStation << endl;
-            cout << left << setw(15) << "To station:" << users[indexOfUsers].ridedetails[i].checkOutStation << endl;
-            if (buyTicket || users[indexOfUsers].Sub.index == 'W') {
-                cout << left << setw(15) << "Cost:" << users[indexOfUsers].ridedetails[i].cost << endl;
+        if (users[indexOfUsers].Sub.ridesCount > 0) {
+            cout << users[indexOfUsers].UserAccount.username << " Rides:" << endl;
+            for (int i = users[indexOfUsers].Sub.ridesCount - 1; i >= 0; i--) {
+                cout << "Ride " << setw(10) << i + 1 << endl;
+                cout << "------------------------------------------\n";
+                cout << left << setw(15) << "Date:" << users[indexOfUsers].ridedetails[i].rideDate << endl;
+                cout << left << setw(15) << "Ride ID:" << users[indexOfUsers].ridedetails[i].rideID << endl;
+                cout << left << setw(15) << "From station:" << users[indexOfUsers].ridedetails[i].checkInStation << endl;
+                cout << left << setw(15) << "To station:" << users[indexOfUsers].ridedetails[i].checkOutStation << endl;
+                if (buyTicket || users[indexOfUsers].Sub.index == 'W') {
+                    cout << left << setw(15) << "Cost:" << users[indexOfUsers].ridedetails[i].cost << endl;
+                }
+                cout << "------------------------------------------\n";
             }
-            cout << "------------------------------------------\n";
+        }
+        else {
+            cout << "No rides booked." << endl;
         }
 
         cout << "Do you want to return to the main menu? (y/n): ";
         cin >> choice;
     } while (choice != 'y' && choice != 'Y');
 }
+
 void viewAllRides() {
     char choice;
     do {
@@ -1181,39 +1317,36 @@ void subtype()
     } while (c == false);
 
 }
-
-int stages(int& stage)
-{
+int buyCostStages(int& stage) {
     char ch;
     char subIndex = users[indexOfUsers].Sub.index;
 
     // Find the index of the subscription type
-    int subTypeIndex;
-    for (subTypeIndex = 0; subTypeIndex < realSub; subTypeIndex++) {
-        if (SubTypes[subTypeIndex].index == subIndex) {
+    int i;
+    for (i = 0; i < realSub; i++) {
+        if (SubTypes[i].index == subIndex) {
             break;
         }
     }
 
-    // If the subscription type is found
-    if (subTypeIndex < realSub) {
-        cout << "You must pay " << SubTypes[subTypeIndex].price[stage - 1] << endl
-            << "Press 'y' to continue payment: ";
+
+
+    cout << "You must pay " << SubTypes[i].price[stage - 1] << endl;
+    cout << "Press 'y' to continue payment: " << endl;
+    
+    // While loop for user confirmation (y or Y)
+    while (true) {
         cin >> ch;
 
-        if (ch == 'y') {
-            return SubTypes[subTypeIndex].price[stage - 1];
+        if (ch == 'y' || ch == 'Y') {
+            DeletScreen();
+            return SubTypes[i].price[stage - 1];
+        }
+        else {
+            cout << "Invalid input. Please enter 'y' or 'Y' to confirm payment: ";
         }
     }
-    else {
-        cout << "Subscription type not found!" << endl;
-    }
-
-    return 0; // Return 0 if there's an error or subscription type not found
 }
-
-
-
 void purchasesubscribtion(int& walletprice, int& stage, float& cost) {
     subtype(); // Assuming this is a valid function call
 
@@ -1236,7 +1369,7 @@ void purchasesubscribtion(int& walletprice, int& stage, float& cost) {
         cout << "4: More than 23 stations, Price: " << SubTypes[i].price[3] << endl;
         cin >> stage;
 
-        cost = stages(stage);
+        cost = buyCostStages(stage);
 
         if (cost > users[indexOfUsers].balance) {
             cout << "Add balance because the balance is not enough." << endl;
@@ -1266,7 +1399,7 @@ void purchasesubscribtion(int& walletprice, int& stage, float& cost) {
         users[indexOfUsers].Sub.stage = stage;
     }
     else {
-        cout << "You must have in your balance money multiple of 10 and less than 400." << endl;
+        cout << "You must have in your Wallet Money multiple of 10 and less than 400." << endl;
         cout << "Select the money at wallet: ";
 
         do {
@@ -1279,7 +1412,8 @@ void purchasesubscribtion(int& walletprice, int& stage, float& cost) {
             }
         } while (true);
 
-        users[indexOfUsers].balance = walletprice;
+        users[indexOfUsers].walletMoney = walletprice;
+        users[indexOfUsers].balance -= walletprice;
     }
 
     users[indexOfUsers].Sub.startDate = CurrentDate(); // Assuming CurrentDate() is a valid function returning a string
@@ -1398,24 +1532,7 @@ void GetTransitionalStationsId() {
     }
 }
 
-void purchaseMetroTicket() {
-   
-    if (users[indexOfUsers].Sub.stage == 1)
-    {
-        users[indexOfUsers].balance -= constantPrice[0];
-    }
-    else if (users[indexOfUsers].Sub.stage == 2)
-    {
-        users[indexOfUsers].balance -= constantPrice[1];
-    }
-    else if (users[indexOfUsers].Sub.stage == 3)
-    {
-        users[indexOfUsers].balance -= constantPrice[2];
-    }
-   
 
-
-}
 void InitializeRide(departure& userDeparture, destination& userDestination) {
 
     users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].rideID = to_string(users[indexOfUsers].id) + to_string(users[indexOfUsers].Sub.ridesCount);
@@ -1423,8 +1540,76 @@ void InitializeRide(departure& userDeparture, destination& userDestination) {
     users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].checkOutStation = GetDestinationName(userDestination);
     users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].rideDate = CurrentDate();
     users[indexOfUsers].Sub.ridesCount++;
-
+   
 }
+
+bool purchaseTicket(int ticketPriceIndex) {
+    if ((users[indexOfUsers].balance - constantPrice[ticketPriceIndex]) < 0) {
+        cout << "You Don't have enough balance!" << endl;
+        return false;
+    }
+    else {
+        // Deduct ticket price from user's balance
+        users[indexOfUsers].balance -= constantPrice[ticketPriceIndex];
+
+        // Store the cost in the ridedetails structure
+        // Assuming ridesCount is the index to store the next ride
+       
+
+        
+       
+
+        return true;
+    }
+}
+int CalulateNumberOfStations(departure& userDeparture, destination& userDestination);
+int reEnterTheRide(departure& userDeparture, destination& userDestination, int& NumberOfStations) {
+    inputDeparture(userDeparture);
+    inputDestination(userDestination);
+    NumberOfStations = 0;
+    return CalulateNumberOfStations(userDeparture, userDestination);
+}
+bool canInitializeTheRide;
+void walletDeduction(int NumberOfStations) {
+    if (users[indexOfUsers].Sub.index == 'W') {
+        int priceToDeduct = 0;
+
+        if (1 < NumberOfStations && NumberOfStations < 10) {
+            priceToDeduct = constantPrice[0];
+        }
+        else if (9 < NumberOfStations && NumberOfStations < 17) {
+            priceToDeduct = constantPrice[1];
+        }
+        else if (16 < NumberOfStations && NumberOfStations < 24) {
+            priceToDeduct = constantPrice[2];
+        }
+        else {
+            priceToDeduct = constantPrice[3];
+        }
+
+        // Check if the price to deduct exceeds the wallet balance
+        if (users[indexOfUsers].walletMoney < priceToDeduct) {
+            cout << "Insufficient funds in the wallet please go and add money to the wallet in manage subscription!." << endl;
+            canInitializeTheRide = false;
+            return; // Exit the function if balance is insufficient
+        }
+        else {
+            users[indexOfUsers].walletMoney -= priceToDeduct;
+            canInitializeTheRide = true;
+            // Store the cost in the ridedetails structure
+            // Assuming ridesCount is the index to store the next ride
+            users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = priceToDeduct;
+
+            // Increment the ridesCount for the next ride
+
+            cout << "The remaining money in the wallet: " << users[indexOfUsers].walletMoney << endl;
+        }
+
+        // Deduct the price from the wallet balance
+       
+    }
+}
+
 int CalulateNumberOfStations(departure& userDeparture, destination& userDestination) {
     int NumberOfStations;
 
@@ -1465,6 +1650,9 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
         else
             NumberOfStations = abs(userDeparture.id - transitionStations[5]) + abs(userDestination.id - transitionStations[4]) + 1;
     }
+    if (users[indexOfUsers].Sub.index == 'W') {
+        walletDeduction(NumberOfStations);
+    }
     char option;    // to choose either to choose again or to use balance
     switch (users[indexOfUsers].Sub.stage) {
     case 1:
@@ -1473,9 +1661,12 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                users[indexOfUsers].balance -= constantPrice[1];
-                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[1];
-                buyTicket = true;
+                if (purchaseTicket(1)) {
+                    users[indexOfUsers].balance -= constantPrice[1];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[1];
+                    buyTicket = true;
+                }
+               
             }
             else if (option == 'n' || option == 'N') {
                 inputDeparture(userDeparture);
@@ -1490,9 +1681,12 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                users[indexOfUsers].balance -= constantPrice[2];
-                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[2];
-                buyTicket = true;
+                if (purchaseTicket(2)) {
+                    users[indexOfUsers].balance -= constantPrice[2];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[2];
+                    buyTicket = true;
+                }
+               
             }
             else if (option == 'n' || option == 'N') {
                 inputDeparture(userDeparture);
@@ -1507,9 +1701,12 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                users[indexOfUsers].balance -= constantPrice[3];
-                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
-                buyTicket = true;
+                if (purchaseTicket(3)) {
+                    users[indexOfUsers].balance -= constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    buyTicket = true;
+                }
+              
             }
             else if (option == 'n' || option == 'N') {
                 inputDeparture(userDeparture);
@@ -1526,9 +1723,12 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                users[indexOfUsers].balance -= constantPrice[2];
-                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[2];
-                buyTicket = true;
+                if (purchaseTicket(2)) {
+                    users[indexOfUsers].balance -= constantPrice[2];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    buyTicket = true;
+                }
+               
             }
             else if (option == 'n' || option == 'N') {
                 inputDeparture(userDeparture);
@@ -1543,9 +1743,15 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                users[indexOfUsers].balance -= constantPrice[3];
-                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
-                buyTicket = true;
+                if (purchaseTicket(3)) {
+                    users[indexOfUsers].balance -= constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    buyTicket = true;
+                }
+                
+                
+                
+                
             }
             else if (option == 'n' || option == 'N') {
                 inputDeparture(userDeparture);
@@ -1562,10 +1768,11 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                users[indexOfUsers].balance -= constantPrice[3];
-                
-                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
-                buyTicket = true;
+                if (purchaseTicket(3)) {
+                    users[indexOfUsers].balance -= constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    buyTicket = true;
+                }
             }
             else if (option == 'n' || option == 'N') {
                 inputDeparture(userDeparture);
@@ -1583,6 +1790,35 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
 
     return NumberOfStations;
 }
+
+
+int checkInAndCheckOut(departure& userDeparture, destination& userDestination) {
+    
+    if ((users[indexOfUsers].Sub.ridesCount <= 0 || users[indexOfUsers].Sub.ValidityDays <= 0 || users[indexOfUsers].Sub.startDate==users[indexOfUsers].Sub.endDate) && (users[indexOfUsers].Sub.index=='M'|| users[indexOfUsers].Sub.index == 'A'||users[indexOfUsers].Sub.index == 'S')) {
+        cout << "Your subscription is invalid. Please renew your subscription." << endl;
+        return 0; // Return 0 to indicate failure
+    }
+    GetTransitionalStationsId();
+    ViewMetroStations();
+    inputDeparture(userDeparture);
+    inputDestination(userDestination);
+    int NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
+    if (NumberOfStations != 0) {
+        cout << NumberOfStations << " Stations";
+       
+    }
+    else
+        cout << "Not enough money! \n";
+    if (users[indexOfUsers].Sub.index=='W' &&!canInitializeTheRide){
+
+    }
+    else {
+        InitializeRide(userDeparture, userDestination);
+    }
+    
+    return NumberOfStations;
+}
+
 //int CalulateNumberOfStations(departure& userDeparture, destination& userDestination) {
 //    int NumberOfStations;
 //
@@ -1737,50 +1973,21 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
 //    return NumberOfStations;
 //}
 
-int checkInAndCheckOut(departure& userDeparture, destination& userDestination) {
-    GetTransitionalStationsId();
-    ViewMetroStations();
-    inputDeparture(userDeparture);
-    inputDestination(userDestination);
-    int NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-    InitializeRide(userDeparture, userDestination);
-    cout << NumberOfStations;
-    return NumberOfStations;
-}
 
 void viewDetails(int walletprice, int valid, int NumberOfStations) {
     cout << "The number of rides: " << users[indexOfUsers].Sub.ridesCount << endl;
     cout << "The type of Subscription: " << users[indexOfUsers].Sub.subName << endl;
-
     if (users[indexOfUsers].Sub.index == 'W') {
-        cout << NumberOfStations << endl;
-        if (1 < NumberOfStations && NumberOfStations < 10) {
-            walletprice -= 10;
-        }
-        else if (9 < NumberOfStations && NumberOfStations < 17) {
-            walletprice -= constantPrice[1];
-        }
-        else if (16 < NumberOfStations && NumberOfStations < 24) {
-            walletprice -= constantPrice[2];
-        }
-        else {
-            walletprice -= constantPrice[3];
-        }
-        cout << "The remaining money: " << walletprice << endl;
-        return;
-    }
+        cout << "The remaining money in the Wallet is " << users[indexOfUsers].walletMoney << endl;
 
-    int i;
-    for (i = 0; i < realSub; i++) {
-        if (users[indexOfUsers].Sub.index == SubTypes[i].index) {
-            break;
-        }
     }
+    else if (users[indexOfUsers].Sub.index == 'A' || users[indexOfUsers].Sub.index == 'M' || users[indexOfUsers].Sub.index == 'S'){
     cout << "The stage of Subscription: " << users[indexOfUsers].Sub.stage << endl;
     cout << "The start of Subscription: " << users[indexOfUsers].Sub.startDate << endl;
     cout << "The End of Subscription: " << users[indexOfUsers].Sub.endDate << endl;
     cout << "The days valid of Subscription: " << users[indexOfUsers].Sub.ValidityDays << endl;
     cout << "The remaining rides: " << users[indexOfUsers].Sub.fullRides - users[indexOfUsers].Sub.ridesCount << endl;
+}
 }
 bool checkTheSub(int walletprice)
 {
@@ -1811,92 +2018,127 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
 {
     int q;
     viewDetails(users[indexOfUsers].balance, valid, NumberOfStations);
-    if ((checkTheSub(walletprice))) {
+    //checkTheSub(walletprice)
 
-        cout << "Do you want to upgrade or renew subscription?" << endl;
-        cout << "1: Renew" << endl;
-        cout << "2: Upgrade" << endl;
-        cout << "3: Exit Manage Subscription" << endl;
-        cout << "Choose: ";
+    cout << "Do you want to upgrade or renew subscription?" << endl;
+    cout << "1: Renew" << endl;
+    cout << "2: Upgrade" << endl;
+    cout << "3: Exit Manage Subscription" << endl;
+    cout << "Choose: ";
+    cin >> q;
+    while (q != 1 && q != 2 && q != 3)
+    {
+        cout << "Invalid choice. Please choose again: ";
         cin >> q;
-        while (q != 1 && q != 2 && q != 3)
-        {
-            cout << "Invalid choice. Please choose again: ";
-            cin >> q;
-        }
-
-        if (q == 1)
-        {
-            bool indexFound = false;
-            for (int i = 0; i < realSub; i++) {
-                if (users[indexOfUsers].Sub.index == SubTypes[i].index) {
-                    indexFound = true;
-                    break;
-                }
-            }
-
-            if (((users[indexOfUsers].Sub.index == 'S') || (users[indexOfUsers].Sub.index == 'M') || (users[indexOfUsers].Sub.index == 'A')) && indexFound)
-            {
-                do
-                {
-                    if (cost <= users[indexOfUsers].balance)
-                    {
-                        users[indexOfUsers].balance -= cost;
-                        users[indexOfUsers].Sub.ridesCount = 0;
-                        users[indexOfUsers].Sub.startDate = CurrentDate();
-                        users[indexOfUsers].Sub.endDate = addDays();
-                        break;
-                    }
-                    else
-                    {
-                        cout << "Add balance Because the balance is not enough" << endl;
-                        int add;
-                        cin >> add;
-
-                        while ((users[indexOfUsers].balance + add) < cost && add) {
-                            cout << "Added balance is still not enough. Please add more balance: ";
-                            int moreToAdd;
-                            cin >> moreToAdd;
-                            add += moreToAdd;
-                        }
-
-                        users[indexOfUsers].balance += add;
-                        users[indexOfUsers].balance -= cost;
-                        users[indexOfUsers].Sub.ridesCount = 0;
-                        users[indexOfUsers].Sub.startDate = CurrentDate();
-                        users[indexOfUsers].Sub.endDate = addDays();
-                    }
-                } while (cost > users[indexOfUsers].balance);
-            }
-            else if (users[indexOfUsers].Sub.index == 'W' && indexFound)
-            {
-                users[indexOfUsers].Sub.ridesCount = 0;
-                cout << "You must have in your balance money multiple of 10 and less than 400." << endl;
-                cout << "Enter the money at wallet: ";
-                cin >> walletprice;
-                users[indexOfUsers].balance += walletprice;
-
-                if (walletprice % 10 != 0 || walletprice > 400)
-                {
-                    cout << "Entered money does not meet the requirements. Please enter again: ";
-                    cin >> walletprice;
-                }
-            }
-            else {
-                cout << "Your old Subscription is not found. You can go to upgrade!" << endl;
-            }
-        }
-        else if (q == 2)
-        {
-            purchasesubscribtion(walletprice, stage, cost);
-        }
-        else if (q == 3) {
-            return;
-        }
     }
 
+    if (q == 1)
+    {
+        bool indexFound = false;
+        for (int i = 0; i < realSub; i++) {
+            if (users[indexOfUsers].Sub.index == SubTypes[i].index) {
+                indexFound = true;
+                break;
+            }
+        }
 
+        if (((users[indexOfUsers].Sub.index == 'S') || (users[indexOfUsers].Sub.index == 'M') || (users[indexOfUsers].Sub.index == 'A')) && indexFound)
+        {
+            do
+            {
+                if (cost <= users[indexOfUsers].balance)
+                {
+                    users[indexOfUsers].balance -= cost;
+                    users[indexOfUsers].Sub.ridesCount = 0;
+                    users[indexOfUsers].Sub.startDate = CurrentDate();
+                    users[indexOfUsers].Sub.endDate = addDays();
+                    break;
+                }
+                else
+                {
+                    cout << "Add balance Because the balance is not enough" << endl;
+                    int add;
+                    cin >> add;
+
+                    while ((users[indexOfUsers].balance + add) < cost && add) {
+                        cout << "Added balance is still not enough. Please add more balance: ";
+                        int moreToAdd;
+                        cin >> moreToAdd;
+                        add += moreToAdd;
+                    }
+
+                    users[indexOfUsers].balance += add;
+                    users[indexOfUsers].balance -= cost;
+                    users[indexOfUsers].Sub.ridesCount = 0;
+                    users[indexOfUsers].Sub.startDate = CurrentDate();
+                    users[indexOfUsers].Sub.endDate = addDays();
+                }
+            } while (cost > users[indexOfUsers].balance);
+        }
+        else if (users[indexOfUsers].Sub.index == 'W' && indexFound)
+        {
+            users[indexOfUsers].Sub.ridesCount = 0;
+            cout << "You must have in your Wallet Money multiple of 10 and less than 400." << endl;
+
+            int walletprice;
+            do {
+                cout << "Enter the money to add to the wallet: ";
+                cin >> walletprice;
+
+                if (walletprice <= 0) {
+                    cout << "Invalid amount. Please enter a positive value." << endl;
+                }
+                else if (walletprice % 10 != 0 || walletprice > 400) {
+                    cout << "Entered money must be a multiple of ten and less than 400." << endl;
+                }
+            } while (walletprice <= 0 || walletprice % 10 != 0 || walletprice > 400);
+            while (users[indexOfUsers].balance < walletprice) {
+                cout << "The entered wallet price exceeds your balance." << endl;
+                cout << "Do you want to update your profile to add more balance? (y/n): ";
+                char response;
+                cin >> response;
+
+                // Convert response to lowercase
+               
+
+                if (response == 'y'||response=='Y') {
+                    // Call updateProfile function here
+                    UpdatePersonalInformation();
+                    cout << "Profile updated successfully." << endl;
+                    break;
+                }
+                else if (response == 'n') {
+                    // Return to the beginning of the loop to ask for wallet price again
+                    cout << "Please enter another wallet price: ";
+                    cin >> walletprice;
+                }
+                else {
+                    // Invalid input, ask the user to enter again
+                    cout << "Invalid choice. Please enter 'y' for yes or 'n' for no." << endl;
+                }
+            }
+
+            users[indexOfUsers].walletMoney += walletprice;
+            users[indexOfUsers].balance -= walletprice; // Deduct wallet price from balance
+        }
+
+
+        else {
+            cout << "Your old Subscription is not found. You can go to upgrade!" << endl;
+        }
+    }
+    else if (q == 2)
+    {
+        purchasesubscribtion(walletprice, stage, cost);
+    }
+    else if (q == 3) {
+        return;
+    }
 }
+
+
+
+
 
 
 void LogOut();
@@ -1954,16 +2196,18 @@ void AdminMainMenu() {
 void UpdatePersonalInformation() {
     int choose;
     char complete;
-    cout << "What do you want to change?" << endl;
-    cout << "1: Name " << endl;
-    cout << "2: Password " << endl;
-    cout << "3: Email " << endl;
-    cout << "4: Balance" << endl;
-    cout << "Choose: " << endl;
-    cin >> choose;
 
     do {
-        while (choose > 4 || choose < 1) {
+        cout << "What do you want to change?" << endl;
+        cout << "1: Name " << endl;
+        cout << "2: Password " << endl;
+        cout << "3: Email " << endl;
+        cout << "4: Balance" << endl;
+        cout << "5: Exit" << endl; // Added option 5: Exit
+        cout << "Choose: " << endl;
+        cin >> choose;
+
+        while (choose > 5 || choose < 1) { // Adjusted the upper limit to include option 5
             cout << "Sorry, please repeat your choice:" << endl;
             cin >> choose;
         }
@@ -1992,11 +2236,17 @@ void UpdatePersonalInformation() {
                 }
             } while (!isBalancePositive(users[indexOfUsers].balance));
         }
+        else if (choose == 5) { // Added option 5: Exit
+            cout << "Exiting..." << endl;
+            break; // Exit the loop
+        }
 
         cout << "Do you want to change anything else? (y/n)" << endl;
         cin >> complete;
     } while (complete == 'y' || complete == 'Y');
 }
+
+
 void drawHeader() {
     cout << setw(70) << "----------------------" << endl;
     cout << setw(70) << "|     MetroMate      |" << endl;
@@ -2021,7 +2271,9 @@ void userMenu(departure& userDeparture, destination& userDestination)
     while (true) {
         cout << "Hello " << users[indexOfUsers].UserAccount.email << endl;
         cout << "Your Balance:" << users[indexOfUsers].balance << endl;
-       
+        if (users[indexOfUsers].Sub.index=='W') {
+            cout << "Wallet Money " << users[indexOfUsers].walletMoney << endl;
+       }
         cout << "Choose: " << endl;
         cout << "-------------------------------" << endl;
         cout << "1: Add Ride " << endl;
@@ -2074,7 +2326,12 @@ void MainMenu() {
         cout << "3. Close the program\n";
         cout << "Enter your choice: ";
         cin >> accountExist;
-
+        if (cin.fail()) {
+            cout << "Invalid input. Please enter a number.\n";
+            cin.clear(); // Clear fail state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore remaining characters in the input buffer
+            continue; // Skip to the next iteration
+        }
         switch (accountExist) {
         case 1:
             if (Login()) {
