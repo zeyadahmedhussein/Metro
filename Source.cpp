@@ -1245,9 +1245,9 @@ void viewUserRideHistory() {
                 cout << left << setw(15) << "Ride ID:" << users[indexOfUsers].ridedetails[i].rideID << endl;
                 cout << left << setw(15) << "From station:" << users[indexOfUsers].ridedetails[i].checkInStation << endl;
                 cout << left << setw(15) << "To station:" << users[indexOfUsers].ridedetails[i].checkOutStation << endl;
-                if (buyTicket || users[indexOfUsers].Sub.index == 'W') {
+               // if (buyTicket || users[indexOfUsers].Sub.index == 'W') {
                     cout << left << setw(15) << "Cost:" << users[indexOfUsers].ridedetails[i].cost << endl;
-                }
+                //}
                 cout << "------------------------------------------\n";
             }
         }
@@ -1386,17 +1386,17 @@ void purchasesubscribtion(int& walletprice, int& stage, float& cost) {
             users[indexOfUsers].balance += add;
         }
 
-        if (cost >= users[indexOfUsers].balance) {
-            users[indexOfUsers].balance = 0;
-        }
+       
         else {
             users[indexOfUsers].balance -= cost;
+            users[indexOfUsers].Sub.ridesCount = 0;
+            users[indexOfUsers].Sub.startDate = CurrentDate();
+            users[indexOfUsers].Sub.endDate = addDays();
+            users[indexOfUsers].Sub.stage = stage;
         }
 
-        users[indexOfUsers].Sub.ridesCount = 0;
-        users[indexOfUsers].Sub.startDate = CurrentDate();
-        users[indexOfUsers].Sub.endDate = addDays();
-        users[indexOfUsers].Sub.stage = stage;
+       
+      
     }
     else {
         cout << "You must have in your Wallet Money multiple of 10 and less than 400." << endl;
@@ -1431,7 +1431,7 @@ void inputDeparture(departure& userDeparture) {
         cout << "Enter 1 or 2 or 3" << endl;
         cin >> userDeparture.line;
     }
-    ViewMetroStations(userDeparture.line);
+  
 
     cout << "Enter your departure station (ID):\n " << endl;
     cin >> userDeparture.id;
@@ -1491,7 +1491,7 @@ void inputDestination(destination& userDestination) {
         cout << "Enter 1 or 2 or 3" << endl;
         cin >> userDestination.line;
     }
-    ViewMetroStations(userDestination.line);
+   
     cout << "Enter your destination station (ID): \n " << endl;
     cin >> userDestination.id;
 }
@@ -1549,15 +1549,8 @@ bool purchaseTicket(int ticketPriceIndex) {
         return false;
     }
     else {
-        // Deduct ticket price from user's balance
-        users[indexOfUsers].balance -= constantPrice[ticketPriceIndex];
 
-        // Store the cost in the ridedetails structure
-        // Assuming ridesCount is the index to store the next ride
-       
 
-        
-       
 
         return true;
     }
@@ -1598,8 +1591,9 @@ void walletDeduction(int NumberOfStations) {
             canInitializeTheRide = true;
             // Store the cost in the ridedetails structure
             // Assuming ridesCount is the index to store the next ride
-            users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = priceToDeduct;
-
+            
+            
+           
             // Increment the ridesCount for the next ride
 
             cout << "The remaining money in the wallet: " << users[indexOfUsers].walletMoney << endl;
@@ -1661,10 +1655,11 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
             cin >> option;
             if (option == 'Y' || option == 'y') {
-                if (purchaseTicket(1)) {
-                    users[indexOfUsers].balance -= constantPrice[1];
-                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[1];
-                    buyTicket = true;
+               if (purchaseTicket(1)) {
+                   users[indexOfUsers].balance -= constantPrice[1];
+                   users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].cost = constantPrice[1];
+                   
+                   buyTicket = true;
                 }
                
             }
@@ -1683,7 +1678,8 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             if (option == 'Y' || option == 'y') {
                 if (purchaseTicket(2)) {
                     users[indexOfUsers].balance -= constantPrice[2];
-                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[2];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].cost = constantPrice[2];
+                
                     buyTicket = true;
                 }
                
@@ -1703,7 +1699,8 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             if (option == 'Y' || option == 'y') {
                 if (purchaseTicket(3)) {
                     users[indexOfUsers].balance -= constantPrice[3];
-                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].cost = constantPrice[3];
+       
                     buyTicket = true;
                 }
               
@@ -1725,7 +1722,8 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             if (option == 'Y' || option == 'y') {
                 if (purchaseTicket(2)) {
                     users[indexOfUsers].balance -= constantPrice[2];
-                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].cost = constantPrice[2];
+             
                     buyTicket = true;
                 }
                
@@ -1745,7 +1743,8 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             if (option == 'Y' || option == 'y') {
                 if (purchaseTicket(3)) {
                     users[indexOfUsers].balance -= constantPrice[3];
-                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].cost = constantPrice[3];
+       
                     buyTicket = true;
                 }
                 
@@ -1769,8 +1768,10 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
             cin >> option;
             if (option == 'Y' || option == 'y') {
                 if (purchaseTicket(3)) {
+                    
                     users[indexOfUsers].balance -= constantPrice[3];
-                    users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
+                    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].cost = constantPrice[3];
+            
                     buyTicket = true;
                 }
             }
@@ -1784,17 +1785,17 @@ int CalulateNumberOfStations(departure& userDeparture, destination& userDestinat
         }
         break;
     }
+   
 
-    // Increment ridesCount after processing each ride
-    users[indexOfUsers].ridesCount++;
-
+ 
+   
     return NumberOfStations;
 }
 
 
 int checkInAndCheckOut(departure& userDeparture, destination& userDestination) {
     
-    if ((users[indexOfUsers].Sub.ridesCount <= 0 || users[indexOfUsers].Sub.ValidityDays <= 0 || users[indexOfUsers].Sub.startDate==users[indexOfUsers].Sub.endDate) && (users[indexOfUsers].Sub.index=='M'|| users[indexOfUsers].Sub.index == 'A'||users[indexOfUsers].Sub.index == 'S')) {
+    if ((users[indexOfUsers].Sub.fullRides-users[indexOfUsers].Sub.ridesCount <= 0 || users[indexOfUsers].Sub.ValidityDays <= 0 ) && (users[indexOfUsers].Sub.index=='M'|| users[indexOfUsers].Sub.index == 'A'||users[indexOfUsers].Sub.index == 'S')) {
         cout << "Your subscription is invalid. Please renew your subscription." << endl;
         return 0; // Return 0 to indicate failure
     }
@@ -1819,159 +1820,7 @@ int checkInAndCheckOut(departure& userDeparture, destination& userDestination) {
     return NumberOfStations;
 }
 
-//int CalulateNumberOfStations(departure& userDeparture, destination& userDestination) {
-//    int NumberOfStations;
-//
-//    //cout << transitionStations[0] << ' ' << ' ' << transitionStations[1] << ' ' << transitionStations[2] << ' ' << transitionStations[3] << ' ' << transitionStations[4] << ' ' << transitionStations[5] << endl;
-//    if (userDeparture.line == userDestination.line)
-//        NumberOfStations = abs(userDestination.id - userDeparture.id) + 1;
-//    else if (userDeparture.line == 1 && userDestination.line == 2)
-//        NumberOfStations = abs(userDeparture.id - transitionStations[0]) + abs(userDestination.id - transitionStations[1]) + 1;
-//    // int a [10] { shohada line one , shohada line 2 , nasser line one , nasser line 3}
-//    else if (userDeparture.line == 1 && userDestination.line == 3) {
-//        if (userDeparture.id <= transitionStations[0] && userDestination.id >= transitionStations[3])
-//            NumberOfStations = abs(userDeparture.id - transitionStations[4]) + abs(userDestination.id - transitionStations[5]) - 1;
-//        else
-//            NumberOfStations = abs(userDeparture.id - transitionStations[4]) + abs(userDestination.id - transitionStations[5]) + 1;
-//    }
-//    else if (userDeparture.line == 2 && userDestination.line == 1)
-//        NumberOfStations = abs(userDeparture.id - transitionStations[1]) + abs(userDestination.id - transitionStations[0]) + 1;
-//
-//    else if (userDeparture.line == 2 && userDestination.line == 3) {
-//        if (userDeparture.id >= transitionStations[3] && userDestination.id <= transitionStations[5])
-//            NumberOfStations = abs(userDeparture.id - transitionStations[2]) + abs(userDestination.id - transitionStations[3]) - 1;
-//
-//        else
-//            NumberOfStations = abs(userDeparture.id - transitionStations[2]) + abs(userDestination.id - transitionStations[3]) + 1;
-//    }
-//    else if (userDeparture.line == 3 && userDestination.line == 1) {
-//        if (userDeparture.id >= transitionStations[3] && userDestination.id <= transitionStations[0])
-//            NumberOfStations = abs(userDeparture.id - transitionStations[5]) + abs(userDestination.id - transitionStations[4]) - 1;
-//        else
-//            NumberOfStations = abs(userDeparture.id - transitionStations[5]) + abs(userDestination.id - transitionStations[4]) + 1;
-//    }
-//
-//    else if (userDeparture.line == 3 && userDestination.line == 2) {
-//        if (userDeparture.id <= transitionStations[5] && userDestination.id >= transitionStations[3])
-//            NumberOfStations = abs(userDeparture.id - transitionStations[3]) + abs(userDestination.id - transitionStations[2]) - 1;
-//        else
-//            NumberOfStations = abs(userDeparture.id - transitionStations[5]) + abs(userDestination.id - transitionStations[4]) + 1;
-//    }
-//    char option;    // to choose either to choose again or to use balance
-//    switch (users[indexOfUsers].Sub.stage) {
-//    case 1:
-//        if (NumberOfStations > 9 && NumberOfStations <= 16) {
-//            cout << "Number of stations is more than the stage you have chosen (stage 1)." << endl;
-//            cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
-//            cin >> option;
-//            if (option == 'Y' || option == 'y') {
-//                users[indexOfUsers].balance -= constantPrice[1];
-//                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[1];
-//                buyTicket = true;
-//            }
-//            else if (option == 'n' || option == 'N') {
-//                inputDeparture(userDeparture);
-//                inputDestination(userDestination);
-//                NumberOfStations = 0;
-//                NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-//                return NumberOfStations;
-//            }
-//        }
-//        else if (NumberOfStations > 16 && NumberOfStations <= 23) {
-//            cout << "Number of stations is more than the stage you have chosen (stage 1)." << endl;
-//            cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
-//            cin >> option;
-//            if (option == 'Y' || option == 'y') {
-//                users[indexOfUsers].balance -= constantPrice[2];
-//                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[2];
-//                buyTicket = true;
-//            }
-//            else if (option == 'n' || option == 'N') {
-//                inputDeparture(userDeparture);
-//                inputDestination(userDestination);
-//                NumberOfStations = 0;
-//                NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-//                return NumberOfStations;
-//            }
-//        }
-//        else if (NumberOfStations > 23) {
-//            cout << "Number of stations is more than the stage you have chosen (stage 1)." << endl;
-//            cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
-//            cin >> option;
-//            if (option == 'Y' || option == 'y') {
-//                users[indexOfUsers].balance -= constantPrice[3];
-//                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
-//                buyTicket = true;
-//            }
-//            else if (option == 'n' || option == 'N') {
-//                inputDeparture(userDeparture);
-//                inputDestination(userDestination);
-//                NumberOfStations = 0;
-//                NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-//                return NumberOfStations;
-//            }
-//        }
-//        break;
-//    case 2:
-//        if (NumberOfStations > 16 && NumberOfStations <= 23) {
-//            cout << "Number of stations is more than the stage you have chosen (stage 2)." << endl;
-//            cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
-//            cin >> option;
-//            if (option == 'Y' || option == 'y') {
-//                users[indexOfUsers].balance -= constantPrice[2];
-//                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[2];
-//                buyTicket = true;
-//            }
-//            else if (option == 'n' || option == 'N') {
-//                inputDeparture(userDeparture);
-//                inputDestination(userDestination);
-//                NumberOfStations = 0;
-//                NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-//                return NumberOfStations;
-//            }
-//        }
-//        else if (NumberOfStations > 23) {
-//            cout << "Number of stations is more than the stage you have chosen (stage 2)." << endl;
-//            cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
-//            cin >> option;
-//            if (option == 'Y' || option == 'y') {
-//                users[indexOfUsers].balance -= constantPrice[3];
-//                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
-//                buyTicket = true;
-//            }
-//            else if (option == 'n' || option == 'N') {
-//                inputDeparture(userDeparture);
-//                inputDestination(userDestination);
-//                NumberOfStations = 0;
-//                NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-//                return NumberOfStations;
-//            }
-//        }
-//        break;
-//    case 3:
-//        if (NumberOfStations > 23) {
-//            cout << "Number of stations is more than the stage you have chosen (stage 3)." << endl;
-//            cout << "Do you want to purchase from your balance (y)? Or enter the destination again (n)?" << endl;
-//            cin >> option;
-//            if (option == 'Y' || option == 'y') {
-//                users[indexOfUsers].balance -= constantPrice[3];
-//                users[indexOfUsers].ridedetails[users[indexOfUsers].ridesCount].cost = constantPrice[3];
-//                buyTicket = true;
-//            }
-//            else if (option == 'n' || option == 'N') {
-//                inputDeparture(userDeparture);
-//                inputDestination(userDestination);
-//                NumberOfStations = 0;
-//                NumberOfStations = CalulateNumberOfStations(userDeparture, userDestination);
-//                return NumberOfStations;
-//            }
-//        }
-//        break;
-//    }
-//
-//
-//    return NumberOfStations;
-//}
+
 
 
 void viewDetails(int walletprice, int valid, int NumberOfStations) {
@@ -1994,7 +1843,7 @@ bool checkTheSub(int walletprice)
     char subIndex = users[indexOfUsers].Sub.index;
     for (int i = 0; i < realSub; i++) {
         if (SubTypes[i].index == subIndex) {
-            if (SubTypes[i].ridesCount - users[indexOfUsers].ridesCount == 0) {
+            if (SubTypes[i].ridesCount - users[indexOfUsers].Sub.ridesCount == 0) {
                 cout << "Your subscription is not valid" << endl;
                 return true;
             }
@@ -2014,11 +1863,9 @@ bool checkTheSub(int walletprice)
 
     return false;
 }
-void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float& cost, int& stage)
-{
+void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float& cost, int& stage) {
     int q;
     viewDetails(users[indexOfUsers].balance, valid, NumberOfStations);
-    //checkTheSub(walletprice)
 
     cout << "Do you want to upgrade or renew subscription?" << endl;
     cout << "1: Renew" << endl;
@@ -2026,14 +1873,13 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
     cout << "3: Exit Manage Subscription" << endl;
     cout << "Choose: ";
     cin >> q;
-    while (q != 1 && q != 2 && q != 3)
-    {
+
+    while (q != 1 && q != 2 && q != 3) {
         cout << "Invalid choice. Please choose again: ";
         cin >> q;
     }
 
-    if (q == 1)
-    {
+    if (q == 1) {
         bool indexFound = false;
         for (int i = 0; i < realSub; i++) {
             if (users[indexOfUsers].Sub.index == SubTypes[i].index) {
@@ -2042,25 +1888,21 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
             }
         }
 
-        if (((users[indexOfUsers].Sub.index == 'S') || (users[indexOfUsers].Sub.index == 'M') || (users[indexOfUsers].Sub.index == 'A')) && indexFound)
-        {
-            do
-            {
-                if (cost <= users[indexOfUsers].balance)
-                {
+        if (((users[indexOfUsers].Sub.index == 'S') || (users[indexOfUsers].Sub.index == 'M') || (users[indexOfUsers].Sub.index == 'A')) && indexFound) {
+            do {
+                if (cost <= users[indexOfUsers].balance) {
                     users[indexOfUsers].balance -= cost;
-                    users[indexOfUsers].Sub.ridesCount = 0;
+                    users[indexOfUsers].Sub.ridesCount = 0; // Reset rides count
                     users[indexOfUsers].Sub.startDate = CurrentDate();
                     users[indexOfUsers].Sub.endDate = addDays();
-                    break;
+                    cout << users[indexOfUsers].Sub.ridesCount;
                 }
-                else
-                {
-                    cout << "Add balance Because the balance is not enough" << endl;
+                else {
+                    cout << "Add balance because the balance is not enough" << endl;
                     int add;
                     cin >> add;
 
-                    while ((users[indexOfUsers].balance + add) < cost && add) {
+                    while ((users[indexOfUsers].balance + add) < cost) {
                         cout << "Added balance is still not enough. Please add more balance: ";
                         int moreToAdd;
                         cin >> moreToAdd;
@@ -2069,15 +1911,15 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
 
                     users[indexOfUsers].balance += add;
                     users[indexOfUsers].balance -= cost;
-                    users[indexOfUsers].Sub.ridesCount = 0;
+                    users[indexOfUsers].Sub.ridesCount = 0; // Reset rides count
                     users[indexOfUsers].Sub.startDate = CurrentDate();
                     users[indexOfUsers].Sub.endDate = addDays();
                 }
             } while (cost > users[indexOfUsers].balance);
         }
-        else if (users[indexOfUsers].Sub.index == 'W' && indexFound)
-        {
-            users[indexOfUsers].Sub.ridesCount = 0;
+        else if (users[indexOfUsers].Sub.index == 'W' && indexFound) {
+            // Handling wallet subscription
+            users[indexOfUsers].Sub.ridesCount = 0; // Reset rides count
             cout << "You must have in your Wallet Money multiple of 10 and less than 400." << endl;
 
             int walletprice;
@@ -2092,22 +1934,20 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
                     cout << "Entered money must be a multiple of ten and less than 400." << endl;
                 }
             } while (walletprice <= 0 || walletprice % 10 != 0 || walletprice > 400);
+
             while (users[indexOfUsers].balance < walletprice) {
                 cout << "The entered wallet price exceeds your balance." << endl;
                 cout << "Do you want to update your profile to add more balance? (y/n): ";
                 char response;
                 cin >> response;
 
-                // Convert response to lowercase
-               
-
-                if (response == 'y'||response=='Y') {
+                if (response == 'y' || response == 'Y') {
                     // Call updateProfile function here
                     UpdatePersonalInformation();
                     cout << "Profile updated successfully." << endl;
                     break;
                 }
-                else if (response == 'n') {
+                else if (response == 'n' || response == 'N') {
                     // Return to the beginning of the loop to ask for wallet price again
                     cout << "Please enter another wallet price: ";
                     cin >> walletprice;
@@ -2121,20 +1961,19 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
             users[indexOfUsers].walletMoney += walletprice;
             users[indexOfUsers].balance -= walletprice; // Deduct wallet price from balance
         }
-
-
         else {
             cout << "Your old Subscription is not found. You can go to upgrade!" << endl;
         }
     }
-    else if (q == 2)
-    {
+    else if (q == 2) {
         purchasesubscribtion(walletprice, stage, cost);
+        users[indexOfUsers].Sub.ridesCount = 0;
     }
     else if (q == 3) {
         return;
     }
 }
+
 
 
 
