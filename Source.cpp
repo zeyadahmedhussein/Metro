@@ -1549,7 +1549,9 @@ void InitializeRide(departure& userDeparture, destination& userDestination) {
     users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].rideID = to_string(users[indexOfUsers].id) + to_string(users[indexOfUsers].Sub.ridesCount);
    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].checkInStation = GetDepartureName(userDeparture);
     users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].checkOutStation = GetDestinationName(userDestination);
-    users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].rideDate = CurrentDate();
+   users[indexOfUsers].ridedetails[users[indexOfUsers].Sub.ridesCount].rideDate = CurrentDate();
+   stations[userDeparture.line - 1][userDeparture.id - 1].numberOfCheckIn++;
+   stations[userDestination.line - 1][userDestination.id - 1].numberOfCheckOut++;
     users[indexOfUsers].Sub.ridesCount++;
    
 }
