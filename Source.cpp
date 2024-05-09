@@ -38,6 +38,7 @@ struct Subscription {
     int ridesCount;
     float price[4];
     int fullRides;
+    int subscriptionCount;
 }SubTypes[4];
 
 struct Account {
@@ -1985,6 +1986,37 @@ void ManageSubscription(int& walletprice, int valid, int NumberOfStations, float
     else if (q == 3) {
         return;
     }
+}
+void generateReport() {
+
+    int maxCheckIn = stations[0][0].numberOfCheckIn;
+    int maxCheckOut = stations[0][0].numberOfCheckOut;
+    int maxSubscriptionPlan = SubTypes[0].subscriptionCount;
+    string stationWithMaxCheckIn = stations[0][0].name;
+    string stationWithMaxCheckOut = stations[0][0].name;
+    string subscriptionName = SubTypes[0].subName;
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < maxStations; ++j) {
+            if (stations[i][j].numberOfCheckIn > maxCheckIn) {
+                maxCheckIn = stations[i][j].numberOfCheckIn;
+            }
+            if (stations[i][j].numberOfCheckOut > maxCheckOut) {
+                maxCheckOut = stations[i][j].numberOfCheckOut;
+            }
+        }
+    }
+
+    for (int i = 0; i < realSub; i++) {
+        if (SubTypes[i].subscriptionCount > maxSubscriptionPlan) {
+            maxSubscriptionPlan = SubTypes[i].subscriptionCount;
+            subscriptionName = SubTypes[i].subName;
+        }
+    }
+    cout << stationWithMaxCheckIn << ": Highest number of check-ins: " << maxCheckIn << endl;
+    cout << stationWithMaxCheckOut << "Highest number of check-outs: " << maxCheckOut << endl;
+    cout << subscriptionName<<": is the Highest number of subscription plans: " << maxSubscriptionPlan;
+
 }
 
 
